@@ -1,0 +1,44 @@
+name: Automated Data Preprocessing
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'telco_churn_raw/**'
+      - 'preprocessing/automate_Eko_Rahmat_Slamet_Hidayat_Saputra.py'
+  workflow_dispatch:
+
+jobs:
+  preprocess:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.7'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas scikit-learn numpy
+
+      - name: Run Automation Script
+        run: |
+          python preprocessing/automate_Eko_Rahmat_Slamet_Hidayat_Saputra.py
+
+      - name: Commit and Push Processed Data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add preprocessing/telco_churn_preprocessing/train.csv
+          git add preprocessing/telco_churn_preprocessing/test.csv
+          git commit -m "Automated preprocessing update via GitHub Actions" --allow-empty
+          git push
